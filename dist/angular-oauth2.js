@@ -14,10 +14,6 @@
     }
 })(this, function(angular, queryString) {
     var ngModule = angular.module("angular-oauth2", [ "ipCookie" ]).config(oauthConfig).factory("oauthInterceptor", oauthInterceptor).provider("OAuth", OAuthProvider).provider("OAuthToken", OAuthTokenProvider);
-    function oauthConfig($httpProvider) {
-        $httpProvider.interceptors.push("oauthInterceptor");
-    }
-    oauthConfig.$inject = [ "$httpProvider" ];
     function oauthInterceptor($q, $rootScope, OAuthToken) {
         return {
             request: function(config) {
@@ -88,7 +84,7 @@
                 _prototypeProperties(OAuth, null, {
                     isAuthenticated: {
                         value: function isAuthenticated() {
-                            return !!OAuthToken.token;
+                            return !!OAuthToken.getToken();
                         },
                         writable: true,
                         enumerable: true,
@@ -115,7 +111,7 @@
                                 }
                             }, options);
                             return $http.post("" + config.baseUrl + "" + config.grantPath, data, options).then(function(response) {
-                                OAuthToken.token = response.data;
+                                OAuthToken.setToken(response.data);
                                 return response;
                             });
                         },
@@ -140,7 +136,7 @@
                                 }
                             };
                             return $http.post("" + config.baseUrl + "" + config.grantPath, data, options).then(function(response) {
-                                OAuthToken.token = response.data;
+                                OAuthToken.setToken(response.data);
                                 return response;
                             });
                         },
@@ -196,19 +192,25 @@
             var OAuthToken = function() {
                 function OAuthToken() {}
                 _prototypeProperties(OAuthToken, null, {
-                    token: {
-                        set: function(data) {
+                    setToken: {
+                        value: function setToken(data) {
                             return ipCookie(config.name, data, config.options);
                         },
-                        get: function() {
+                        writable: true,
+                        enumerable: true,
+                        configurable: true
+                    },
+                    getToken: {
+                        value: function getToken() {
                             return ipCookie(config.name);
                         },
+                        writable: true,
                         enumerable: true,
                         configurable: true
                     },
                     getAccessToken: {
                         value: function getAccessToken() {
-                            return this.token ? this.token.access_token : undefined;
+                            return this.getToken() ? this.getToken().access_token : undefined;
                         },
                         writable: true,
                         enumerable: true,
@@ -227,7 +229,7 @@
                     },
                     getRefreshToken: {
                         value: function getRefreshToken() {
-                            return this.token ? this.token.refresh_token : undefined;
+                            return this.getToken() ? this.getToken().refresh_token : undefined;
                         },
                         writable: true,
                         enumerable: true,
@@ -235,7 +237,7 @@
                     },
                     getTokenType: {
                         value: function getTokenType() {
-                            return this.token ? this.token.token_type : undefined;
+                            return this.getToken() ? this.getToken().token_type : undefined;
                         },
                         writable: true,
                         enumerable: true,
@@ -256,5 +258,9 @@
         };
         this.$get.$inject = [ "ipCookie" ];
     }
+    function oauthConfig($httpProvider) {
+        $httpProvider.interceptors.push("oauthInterceptor");
+    }
+    oauthConfig.$inject = [ "$httpProvider" ];
     return ngModule;
 });
