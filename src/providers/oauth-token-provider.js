@@ -41,15 +41,17 @@ function OAuthTokenProvider() {
    * @ngInject
    */
 
-  this.$get = function(ipCookie) {
+  this.$get = function($cookies) {
     class OAuthToken {
 
       /**
        * Set token.
        */
 
-      setToken(data) {
-        return ipCookie(config.name, data, config.options);
+      setToken(data, cookieOptions) {
+        var opts = angular.copy(config.options);
+        angular.extend(opts, cookieOptions);
+        return $cookies.putObject(config.name, data, opts);
       }
 
       /**
@@ -57,7 +59,7 @@ function OAuthTokenProvider() {
        */
 
       getToken() {
-        return ipCookie(config.name);
+        return $cookies.getObject(config.name);
       }
 
       /**
@@ -101,7 +103,7 @@ function OAuthTokenProvider() {
        */
 
       removeToken() {
-        return ipCookie.remove(config.name, config.options);
+        return $cookies.remove(config.name, config.options);
       }
     }
 

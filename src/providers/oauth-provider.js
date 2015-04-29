@@ -112,7 +112,7 @@ function OAuthProvider() {
        * @return {promise} A response promise.
        */
 
-      getAccessToken(user, options) {
+      getAccessToken(user, options, cookieOptions) {
         // Check if `user` has required properties.
         if (!user || !user.username || !user.password) {
           throw new Error('`user` must be an object with `username` and `password` properties.');
@@ -136,7 +136,7 @@ function OAuthProvider() {
         }, options);
 
         return $http.post(`${config.baseUrl}${config.grantPath}`, data, options).then((response) => {
-          OAuthToken.setToken(response.data);
+          OAuthToken.setToken(response.data, cookieOptions);
 
           return response;
         });
