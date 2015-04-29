@@ -73,7 +73,7 @@
                         configurable: true
                     },
                     getAccessToken: {
-                        value: function getAccessToken(user, options) {
+                        value: function getAccessToken(user, options, cookieOptions) {
                             if (!user || !user.username || !user.password) {
                                 throw new Error("`user` must be an object with `username` and `password` properties.");
                             }
@@ -93,7 +93,7 @@
                                 }
                             }, options);
                             return $http.post("" + config.baseUrl + "" + config.grantPath, data, options).then(function(response) {
-                                OAuthToken.setToken(response.data);
+                                OAuthToken.setToken(response.data, cookieOptions);
                                 return response;
                             });
                         },
