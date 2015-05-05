@@ -128,9 +128,14 @@
                     },
                     revokeToken: {
                         value: function revokeToken() {
-                            var data = queryString.stringify({
+                            var data = {
+                                client_id: config.clientId,
                                 token: OAuthToken.getRefreshToken() ? OAuthToken.getRefreshToken() : OAuthToken.getAccessToken()
-                            });
+                            };
+                            if (null !== config.clientSecret) {
+                                data.client_secret = config.clientSecret;
+                            }
+                            data = queryString.stringify(data);
                             var options = {
                                 headers: {
                                     "Content-Type": "application/x-www-form-urlencoded"
