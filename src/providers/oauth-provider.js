@@ -149,7 +149,7 @@ function OAuthProvider() {
        * @return {promise} A response promise.
        */
 
-      getRefreshToken() {
+      getRefreshToken(cookieOptions) {
         var data = {
           client_id: config.clientId,
           grant_type: 'refresh_token',
@@ -167,7 +167,7 @@ function OAuthProvider() {
         };
 
         return $http.post(`${config.baseUrl}${config.grantPath}`, data, options).then((response) => {
-          OAuthToken.setToken(response.data);
+          OAuthToken.setToken(response.data, cookieOptions);
 
           return response;
         });
