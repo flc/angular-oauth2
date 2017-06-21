@@ -21,8 +21,8 @@
     function oauthInterceptor($q, $rootScope, OAuthToken) {
         return {
             request: function(config) {
-                if (OAuthToken.getAuthorizationHeader()) {
-                    config.headers = config.headers || {};
+                config.headers = config.headers || {};
+                if (!config.headers.hasOwnProperty("Authorization") && OAuthToken.getAuthorizationHeader()) {
                     config.headers.Authorization = OAuthToken.getAuthorizationHeader();
                 }
                 return config;
