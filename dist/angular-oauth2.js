@@ -14,15 +14,11 @@
     }
 })(this, function(angular, queryString) {
     var ngModule = angular.module("angular-oauth2", [ "ngCookies" ]).config(oauthConfig).factory("oauthInterceptor", oauthInterceptor).provider("OAuth", OAuthProvider).provider("OAuthToken", OAuthTokenProvider);
-    function oauthConfig($httpProvider) {
-        $httpProvider.interceptors.push("oauthInterceptor");
-    }
-    oauthConfig.$inject = [ "$httpProvider" ];
     function oauthInterceptor($q, $rootScope, OAuthToken) {
         return {
             request: function(config) {
-                config.headers = config.headers || {};
-                if (!config.headers.hasOwnProperty("Authorization") && OAuthToken.getAuthorizationHeader()) {
+                if (OAuthToken.getAuthorizationHeader()) {
+                    config.headers = config.headers || {};
                     config.headers.Authorization = OAuthToken.getAuthorizationHeader();
                 }
                 return config;
@@ -269,5 +265,9 @@
         };
         this.$get.$inject = [ "$cookies" ];
     }
+    function oauthConfig($httpProvider) {
+        $httpProvider.interceptors.push("oauthInterceptor");
+    }
+    oauthConfig.$inject = [ "$httpProvider" ];
     return ngModule;
 });
